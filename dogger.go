@@ -23,6 +23,9 @@ func Get() zerolog.Logger {
 	once.Do(func() {
 
 		correlationKey = os.Getenv("CORRELATION_KEY")
+		if correlationKey == "" {
+			correlationKey = "corrId"
+		}
 		logLevel := os.Getenv("LOG_LEVEL")
 		serviceName := os.Getenv("SERVICE_NAME")
 		serviceEnv := os.Getenv("SERVICE_ENV")
