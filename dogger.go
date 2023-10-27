@@ -22,6 +22,8 @@ var correlationKey string
 func Get() zerolog.Logger {
 	once.Do(func() {
 
+		fmt.Println("Initializing dogger...")
+
 		correlationKey = os.Getenv("CORRELATION_KEY")
 		if correlationKey == "" {
 			correlationKey = "corrId"
@@ -34,7 +36,6 @@ func Get() zerolog.Logger {
 			logMaxSize = 100 // default to 100MB
 		}
 
-		fmt.Println("Initializing logger...")
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		zerolog.TimeFieldFormat = time.RFC3339Nano
 
@@ -138,4 +139,8 @@ func LogError(corrId string, event string, dataObj interface{}, err error) {
 
 func LogDebug(corrId string, event string, dataObj interface{}) {
 	mainLogger("debug", corrId, event, dataObj, nil)
+}
+
+func LogFatal(corrId string, event string, dataObj interface{}) {
+	mainLogger("fatal", corrId, event, dataObj, nil)
 }
