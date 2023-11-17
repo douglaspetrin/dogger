@@ -17,6 +17,7 @@ SERVICE_ENV: The service environment. "development" uses zerolog.ConsoleWriter a
 LOG_MAX_SIZE: The max size of the log file in megabytes. Default: 100
 USING_GIT_REVISION: In case you want to add git revision field to the logging message. Default: false
 USING_GO_VERSION: In case you want to add go version field to the logging message. Default: false
+USING_PID: In case you want to add pid field to the logging message. Default: false
 ````
 
 ## Usage

@@ -22,8 +22,6 @@ var correlationKey string
 func Get() zerolog.Logger {
 	once.Do(func() {
 
-		fmt.Println("Initializing dogger...")
-
 		correlationKey = os.Getenv("CORRELATION_KEY")
 		if correlationKey == "" {
 			correlationKey = "corrId"
@@ -87,6 +85,10 @@ func Get() zerolog.Logger {
 
 		if v, ok := os.LookupEnv("USING_GO_VERSION"); ok && v == "true" {
 			log = log.With().Str("go_version", buildInfo.GoVersion).Logger()
+		}
+
+		if v, ok := os.LookupEnv("USING_PID"); ok && v == "true" {
+			log = log.With().Str("pid", fmt.Sprint(os.Getpid())).Logger()
 		}
 	})
 
