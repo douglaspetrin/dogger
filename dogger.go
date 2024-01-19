@@ -103,6 +103,7 @@ func mainLogger(level string, corrId string, event string, dataObj interface{}, 
 		defer func() {
 			// Sending value to channel
 			done <- true
+			return
 		}()
 
 		data := map[string]any{"data": dataObj}
@@ -125,10 +126,12 @@ func mainLogger(level string, corrId string, event string, dataObj interface{}, 
 			Str(correlationKey, corrId).
 			Str("event", event).Fields(data).Err(err).
 			Send()
+		return
 	}(done, level)
 
 	// Waiting to receive value from channel
 	<-done
+	return
 }
 
 func LogInfo(corrId string, event string, dataObj interface{}) {
