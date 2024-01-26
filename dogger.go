@@ -33,6 +33,21 @@ func Get() zerolog.Logger {
 		if err != nil {
 			logMaxSize = 100 // default to 100MB
 		}
+		logMaxBackups, err := strconv.Atoi(os.Getenv("LOG_MAX_BACKUPS"))
+		if err != nil {
+			logMaxBackups = 0 // default to 0 backups
+		}
+		logMaxAge, err := strconv.Atoi(os.Getenv("LOG_MAX_AGE"))
+		if err != nil {
+			logMaxAge = 0 // default to 0 days
+		}
+
+		// If logMaxBackups and logMaxAge are both 0, no old log files will be deleted.
+
+		logCompressed, err := strconv.ParseBool(os.Getenv("LOG_COMPRESSED"))
+		if err != nil {
+			logCompressed = true // default to compressed
+		}
 
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		zerolog.TimeFieldFormat = time.RFC3339Nano
@@ -45,9 +60,9 @@ func Get() zerolog.Logger {
 		fileLogger := &lumberjack.Logger{
 			Filename:   fmt.Sprintf("%s.log", serviceName),
 			MaxSize:    logMaxSize,
-			MaxBackups: 10,
-			MaxAge:     14,
-			Compress:   true,
+			MaxBackups: logMaxBackups,
+			MaxAge:     logMaxAge,
+			Compress:   logCompressed,
 		}
 
 		var output io.Writer
