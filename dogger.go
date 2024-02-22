@@ -19,6 +19,16 @@ var log zerolog.Logger
 
 var correlationKey string
 
+type logEvent struct {
+	level   string
+	corrId  string
+	event   string
+	dataObj interface{}
+	err     error
+}
+
+var ch = make(chan logEvent, 1000)
+
 func Get() zerolog.Logger {
 	once.Do(func() {
 
@@ -105,6 +115,15 @@ func Get() zerolog.Logger {
 		if v, ok := os.LookupEnv("USING_PID"); ok && v == "true" {
 			log = log.With().Str("pid", fmt.Sprint(os.Getpid())).Logger()
 		}
+
+		go func() {
+			for {
+				select {
+				case evt := <-ch:
+					mainLogger(evt.level, evt.corrId, evt.event, evt.dataObj, evt.err)
+				}
+			}
+		}()
 	})
 
 	return log
@@ -150,17 +169,17 @@ func mainLogger(level string, corrId string, event string, dataObj interface{}, 
 }
 
 func LogInfo(corrId string, event string, dataObj interface{}) {
-	mainLogger("info", corrId, event, dataObj, nil)
+	ch <- logEvent{level: "info", corrId: corrId, event: event, dataObj: dataObj}
 }
 
 func LogError(corrId string, event string, dataObj interface{}, err error) {
-	mainLogger("error", corrId, event, dataObj, err)
+	ch <- logEvent{level: "error", corrId: corrId, event: event, dataObj: dataObj, err: err}
 }
 
 func LogDebug(corrId string, event string, dataObj interface{}) {
-	mainLogger("debug", corrId, event, dataObj, nil)
+	ch <- logEvent{level: "debug", corrId: corrId, event: event, dataObj: dataObj}
 }
 
 func LogFatal(corrId string, event string, dataObj interface{}) {
-	mainLogger("fatal", corrId, event, dataObj, nil)
+	ch <- logEvent{level: "fatal", corrId: corrId, event: event, dataObj: dataObj}
 }
