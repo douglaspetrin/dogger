@@ -18,9 +18,15 @@ var once sync.Once
 var log zerolog.Logger
 
 var correlationKey string
+var off bool
 
 func Get() zerolog.Logger {
 	once.Do(func() {
+
+		off = os.Getenv("LOG_OFF") == "true"
+		if off {
+			return
+		}
 
 		correlationKey = os.Getenv("CORRELATION_KEY")
 		if correlationKey == "" {
@@ -111,6 +117,10 @@ func Get() zerolog.Logger {
 }
 
 func mainLogger(level string, corrId string, event string, dataObj interface{}, err error) {
+	if off {
+		return
+	}
+
 	// Buffered Channel of type Boolean
 	done := make(chan bool, 1)
 
