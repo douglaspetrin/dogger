@@ -10,6 +10,7 @@ go get github.com/douglaspetrin/dogger@latest
 ## Environment variables
 
 ````
+LOG_OFF: If true disables logging.
 CORRELATION_KEY: The key used to identify the correlation id in the context. Default: "corrId"
 LOG_LEVEL: The log level. Default: 0 -> debug
 SERVICE_NAME: The service name. Default: nil
